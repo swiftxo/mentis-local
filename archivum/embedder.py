@@ -10,9 +10,14 @@ def load_embedder(model_name: str = config.EMBED_MODEL_NAME) -> SentenceTransfor
     """Load a sentence embedding model with device auto-detection."""
     
     if config.EMBED_DEVICE == "auto":
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    else:
-        device = config.EMBED_DEVICE
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                device = 'mps'
+        elif torch.cuda.is_available():
+            device = 'cuda'
+        # Fallback to CPU
+        else:
+            device = 'cpu'
+
 
     if VERBOSE:
         print(f"[Embedder|Load] Loading embedder model: {model_name} on device: {device}")

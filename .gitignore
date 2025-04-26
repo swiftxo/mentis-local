@@ -10,7 +10,7 @@ venv/
 # Ignore system files
 .DS_Store
 # Ignore vector database files
-archivum/vectordb/
+
 *.sqlite3
 *.bin
 *.pickle
