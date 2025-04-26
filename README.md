@@ -1,6 +1,5 @@
 # 🧠 mentis-local
-`mentis-local` is a lightweight, local LLM + RAG system that's designed to simulate the interactions of a human memory. It's the MVP of a larger project exploring how local language models and semantic search can be used to organize personal knowledge and surface indirect or hidden connections between ideas.
-
+`mentis-local` is a lightweight, local LLM + RAG system that's designed to simulate the interactions of a human memory. Mentis aims to explore how local language models and semantic search can be used to  explore organize personal knowledge, surface hidden connections between ideas, and enable context-aware interaction with your local files.
 
 
 ## 🧪 MVP Goal
@@ -20,37 +19,28 @@ The short-term goal is a lightweight CLI (or basic web UI) that can:
 
 
 
-## 🔧 Progress & Next Steps
+## 🔧 Current Progress
 
-### ✅ Implementation:
-So far, I have managed to implement the following components:
+### ✅ Archivum Core (Completed)
+- [x] `tokenizer_utils.py` — Tokenizer loading, tokenization utilities
+- [x] `document.py` — Document and chunk structures
+- [x] `parser.py` — PDF/Markdown/Text file parsing
+- [x] `chunker.py` — Sentence-based and sliding window chunking
+- [x] `embedder.py` — Embedding with E5 instruction models
+- [x] `db.py` — Vector database storage and querying
+- [x] `ingest.py` — Ingestion pipeline
+- [x] `query.py` — Basic semantic retrieval
+- [x] Logging / diagnostics: Track timing, chunk counts, retrieval hits
 
-- [x] `tokenizer_utils.py`:  
-  - Token counting + truncation using Hugging Face `tokenizers`
-- [x] `document.py`:  
-  - `Document` and `DocumentChunk` classes  
-  - Metadata handling + structured chunk storage
-- [x] `parser.py`:  
-  - Parses `.md`, `.txt`, and `.pdf` files  
-  - Extracts clean text and initializes document objects
-- [x] `chunker.py`:  
-  - Sentence-aware chunking (via `nltk`)  
-  - Sliding window chunking with token overlap
-- [x] `embedder.py`:  
-  - Embedding via `intfloat/multilingual-e5-large-instruct`  
-  - Supports normalization + batching
-- [x] `test.ipynb`:  
-  - Prototype notebook for end-to-end flow testing
 
-### 🛠️ In Progress / Next Up
-
-- [ ] `index.py`: Embed + store chunks in ChromaDB
-- [ ] `query.py`: Embed queries, perform vector search
-- [ ] `llm_interface.py`: Interface with local LLM (e.g. `gemma-4b-it`)
-- [ ] `interface.py`: Basic CLI or web UI for user interaction
-- [ ] Prompt engineering: System prompt templates + formatting
-- [ ] Logging / diagnostics: Track timing, chunk counts, retrieval hits
+### 🛠 Mentis Extensions (In Progress)
+- [ ] `query.py` — Advanced retrieval + prompt formatting
+- [ ] `llm_interface.py` — Interface with local LLM (e.g., Gemma 4B)
+- [ ] `interface.py` — Basic CLI or minimal Web UI
+- [ ] Prompt templates and augmentation logic
+- [ ] Memory simulation modules (optional future)
 - [ ] Implement encryption to support safe, private syncing of knowledge to the cloud
+
 
 
 
@@ -159,23 +149,8 @@ I am using this project to learn more about how these different technologies wor
 - **Modular by default** — components should be easy to test, swap, or extend without breaking the rest of the system.
 
 If you are interested in reading more details 
-> See: `docs/designprinciples.svg`
+> See: `docs/designprinciples.md`
 
-### 📁 Project Structure (WIP)
-
-```
-mentis-local/
-├── chunker.py
-├── document.py
-├── embedder.py
-├── parser.py
-├── tokenizer_utils.py
-├── test.ipynb
-├── diagrams/
-│   └── pipeline.excalidraw.svg
-├── README.md
-└── [planned files...]
-```
 
 
 ## 📝 Future Writing

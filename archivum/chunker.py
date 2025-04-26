@@ -3,11 +3,12 @@ from typing import List
 from tokenizers import Tokenizer
 from nltk.tokenize import sent_tokenize
 from .tokenizer_utils import tokenize_raw
-import nltk
-nltk.download('punkt_tab')
+import archivum.config as config
 
+VERBOSE = config.VERBOSE
+DEBUG = config.DEBUG
 
-def sliding_window_chunk(text: str, tokenizer: Tokenizer, window: int = 150, stride: int = 30, min_tokens: int = 10) -> List[str]:
+def sliding_window_chunk(text: str, tokenizer: Tokenizer, window: int = config.CHUNK_WINDOW, stride: int = config.CHUNK_STRIDE, min_tokens: int = config.CHUNK_MIN_TOKENS) -> List[str]:
     """Chunk text into overlapping token windows."""
 
     enc = tokenize_raw(text, tokenizer)
@@ -23,10 +24,13 @@ def sliding_window_chunk(text: str, tokenizer: Tokenizer, window: int = 150, str
         chunk = tokenizer.decode(window_ids, skip_special_tokens=True)
         chunks.append(chunk)
 
+    if VERBOSE:
+        print(f"[Chunking|Sliding] Created {len(chunks)} sliding window chunks.")
+
     return chunks
 
 
-def sentence_chunk(text: str, tokenizer: Tokenizer, max_tokens: int = 512, min_tokens: int = 10) -> List[str]:
+def sentence_chunk(text: str, tokenizer: Tokenizer, max_tokens: int = config.CHUNK_MAX_TOKENS, min_tokens: int = config.CHUNK_MIN_TOKENS) -> List[str]:
     """Chunk text by grouping whole sentences under a token budget."""
     
     sentences = sent_tokenize(text)
@@ -49,11 +53,14 @@ def sentence_chunk(text: str, tokenizer: Tokenizer, max_tokens: int = 512, min_t
     if current_chunk and current_len >= min_tokens:
         chunks.append(current_chunk.strip())
 
+    if VERBOSE:
+        print(f"[Chunking|Sentence] Created {len(chunks)} sentence-based chunks.")
+
     return chunks
 
 
-def chunk_text(text: str,tokenizer: Tokenizer,strategy: str = "sentence",max_tokens: int = 512,
-               window: int = 150,stride: int = 30,min_tokens: int = 10,log: bool = False) -> List[str]:
+def chunk_text(text: str,tokenizer: Tokenizer,strategy: str = config.CHUNK_METHOD,max_tokens: int = config.CHUNK_MAX_TOKENS,
+               window: int = config.CHUNK_WINDOW, stride: int = config.CHUNK_STRIDE,min_tokens: int = config.CHUNK_MIN_TOKENS,log: bool = config.CHUNK_LOGGING) -> List[str]:
     """Hybrid chunking interface supporting both sentence and sliding strategies."""
 
     start = time.perf_counter()
@@ -65,16 +72,23 @@ def chunk_text(text: str,tokenizer: Tokenizer,strategy: str = "sentence",max_tok
         raise ValueError(f"Unknown chunking strategy: {strategy}")
     end = time.perf_counter()
 
-    if log:
+    if log or VERBOSE:
         token_count = len(tokenize_raw(text, tokenizer).ids)
-        print(f"[Chunking] Strategy: {strategy} | Tokens: {token_count} | Chunks: {len(chunks)} | Avg tokens/chunk: {round(token_count/len(chunks), 1)} | Time: {round(end-start, 4)}s")
+        print(f"[Chunking|Summary] Strategy: {strategy} | Tokens: {token_count} | Chunks: {len(chunks)} | Avg tokens/chunk: {round(token_count/len(chunks), 1)} | Time: {round(end-start, 4)}s")
+
 
     return chunks
 
 
-def debug_token_chunk(text: str, tokenizer, start: int, end: int):
+def debug_token_chunk(text: str, tokenizer: Tokenizer, start: int, end: int):
+    """Debugging tool to visualize token slices."""
+
     enc = tokenizer.encode(text)
     slice_ids = enc.ids[start:end]
     decoded = tokenizer.decode(slice_ids, skip_special_tokens=True)
-    print(f"Tokens {start}:{end} →", slice_ids)
-    print("Decoded Text →", decoded)
+
+    if DEBUG:
+        print(f"[Debug|Tokens] {start}:{end} → {slice_ids}")
+        print(f"[Debug|Decoded] → {decoded}")
+    else:
+        print("[Debug|Warning] DEBUG mode is not enabled. Enable DEBUG in config.py to see detailed token info.")

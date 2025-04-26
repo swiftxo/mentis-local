@@ -1,51 +1,45 @@
-# `document.py`: Core Data Structures
+# Module: `document.py`
 
-This module defines two classes used across the pipeline to represent parsed and chunked content.
+## Purpose
+Defines core data structures for representing parsed documents and their text chunks, along with helper methods for easy manipulation and serialization.
 
-The parser modules output a `Document`, composed of `DocumentChunk`s. These are passed into:
-- The chunker (if further chunking is needed)
-- The embedder (for vectorization)
-- The retriever (for similarity search)
+---
 
-They act as a **lightweight memory unit** for the system.
+## Classes
 
+#### `DocumentChunk`
+- **Description**: Represents a chunk of text along with its associated metadata.
+- **Attributes**:  
+  - `text` (str): The text content of the chunk.  
+  - `metadata` (dict): Metadata associated with the chunk (e.g., page number, file path).
+- **Methods**:  
+  - `__repr__()`: Returns a shortened preview of the chunk for easier debugging.  
+  - `__len__()`: Returns the character length of the chunk text.  
+  - `get_metadata()`: Returns the metadata dictionary.  
+  - `to_dict()`: Serializes the chunk into a dictionary format.
+- **Notes**:  
+  - If no metadata is provided, an empty dictionary is assigned by default.
 
-## `class DocumentChunk`
+---
 
-A small unit of text (usually a sentence or paragraph) paired with metadata. This is the **core unit** that gets embedded and stored in the vector database.
+#### `Document`
+- **Description**: Represents a full document made up of multiple `DocumentChunk` objects.
+- **Attributes**:  
+  - `chunks` (list[DocumentChunk]): List of text chunks that compose the document.
+- **Methods**:  
+  - `__repr__()`: Returns a summary showing the number of chunks.  
+  - `__len__()`: Returns the number of chunks in the document.  
+  - `get_chunks()`: Retrieves the list of chunks.  
+  - `to_dict()`: Serializes the document into a list of chunk dictionaries.
+- **Notes**:  
+  - Treats a document as simply a collection of its chunks, without enforcing structure beyond that.
 
-<details>
-<summary>Attributes:</summary>
+---
 
-- `text` (str): The chunked text.
-- `metadata` (dict): Optional metadata like page number, source file, etc.
-</details>
+## Dependencies
+- None (standard Python only)
 
-<details>
-<summary>Methods:</summary>
+---
 
-- `__repr__()` → Short preview for debugging.
-- `__len__()` → Returns length of the text.
-- `get_metadata()` → Access metadata.
-- `to_dict()` → Serialize chunk for storage.
-</details>
-
-
-## `class Document`
-
-Wraps a list of `DocumentChunk` objects. Represents a fully parsed file.
-
-<details>
-<summary>Attributes:</summary>
-
-- `chunks` (list[DocumentChunk]): All chunks from a single document.
-</details>
-
-<details>
-<summary>Methods:</summary>
-
-- `__repr__()` → Summary of number of chunks.
-- `__len__()` → Returns number of chunks.
-- `get_chunks()` → Access underlying chunks.
-- `to_dict()` → Serialize the document as a list of dicts.
-</details>
+## Config Settings
+- None

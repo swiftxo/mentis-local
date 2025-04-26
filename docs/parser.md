@@ -1,91 +1,79 @@
-# `parser.py`: File Parsing Utilities
+# Module: `parser.py`
 
-This module converts raw input files (`.pdf`, `.md`, `.txt`) into a standardized `Document` object composed of `DocumentChunk`s.
+## Purpose
+Parses different file types (PDF, Markdown, Text) into `Document` objects containing `DocumentChunks` with associated text and metadata. Provides utilities to parse single files or entire folders.
 
-These parsed documents are then passed into:
-- The chunker (for token-aware splitting)
-- The embedder (for generating embeddings)
-- The vector DB (for storage + retrieval)
+---
 
-It acts as the **entry point for data ingestion** into the `mentis-local` system.
+## Functions
 
+#### `parse_pdf`
+- **Description**: Parses a PDF file and returns a `Document` with one chunk per page containing text and metadata.
+- **Parameters**:  
+  - `file_path` (str): Path to the PDF file.
+- **Returns**:  
+  - `Document`: A document object containing all text chunks from the PDF.
+- **Notes**:  
+  - Only extracts plain text from each page (no images or structured formatting).
 
+---
 
-## `parse_pdf(file_path)`
+#### `parse_md`
+- **Description**: Parses a Markdown file into a single `DocumentChunk`.
+- **Parameters**:  
+  - `file_path` (str): Path to the Markdown file.
+- **Returns**:  
+  - `Document`: A document object containing one chunk with the full Markdown text.
+- **Notes**:  
+  - Treats the entire Markdown file as a single chunk.
 
-Parses a PDF file page-by-page using `PyMuPDF`, extracting text and storing each page as a separate `DocumentChunk`.
+---
 
-<details>
-<summary>Process:</summary>
+#### `parse_txt`
+- **Description**: Parses a plain text file into a single `DocumentChunk`.
+- **Parameters**:  
+  - `file_path` (str): Path to the text file.
+- **Returns**:  
+  - `Document`: A document object containing one chunk with the full text content.
+- **Notes**:  
+  - Treats the entire text file as a single chunk.
 
-- Iterate over each page
-- Extract text via `get_text("text")`
-- Create a `DocumentChunk` per non-empty page
-- Attach `page_number`, `file_path`, and `file_type` as metadata
-</details>
+---
 
-**Returns:** `Document` object with one chunk per page
+#### `parse_file`
+- **Description**: Dispatches parsing based on file extension (.pdf, .md, .txt).
+- **Parameters**:  
+  - `file_path` (str): Path to the file.
+- **Returns**:  
+  - `Document`: A parsed document object appropriate to the file type.
+- **Notes**:  
+  - Raises `ValueError` if an unsupported file type is provided.
 
+---
 
-## `parse_md(file_path)`
+#### `parse_folder`
+- **Description**: Parses all supported files in a folder recursively into a list of `Document` objects.
+- **Parameters**:  
+  - `folder_path` (str): Path to the folder.
+- **Returns**:  
+  - `list[Document]`: A list of parsed document objects.
+- **Notes**:  
+  - Supported file types: `.pdf`, `.md`, `.txt`
+  - Recursively searches subfolders.
 
-Parses a Markdown file as a single `DocumentChunk`.
+---
 
-<details>
-<summary>Process:</summary>
+## Dependencies
+- `pymupdf`
+- `json`
+- `pathlib.Path`
+- `archivum.document.Document`
+- `archivum.document.DocumentChunk`
+- `archivum.config`
 
-- Read the entire `.md` file as raw text
-- Strip leading/trailing whitespace
-- Wrap in one `DocumentChunk` with `file_path` and `file_type` metadata
-</details>
+---
 
-**Returns:** `Document` object with a single chunk
-
-
-
-## `parse_txt(file_path)`
-
-Identical to `parse_md`, but for plain `.txt` files.
-
-<details>
-<summary>Process:</summary>
-
-- Read entire `.txt` file
-- Strip whitespace
-- Create one `DocumentChunk` with basic metadata
-</details>
-
-**Returns:** `Document` object with a single chunk
-
-
-
-## `parse_file(file_path)`
-
-High-level parser that dispatches to the appropriate function based on file extension.
-
-<details>
-<summary>Supported Extensions:</summary>
-
-- `.pdf` → `parse_pdf`
-- `.md` → `parse_md`
-- `.txt` → `parse_txt`
-</details>
-
-**Raises:** `ValueError` if an unsupported file extension is passed.
-
-
-
-## Example Output
-
-```python
-< Document with 3 chunks >
-
-DocumentChunk(
-    text='Canada’s productivity challenge is not...', 
-    metadata={
-        'page_number': 1, 
-        'file_path': 'docs/budget.pdf', 
-        'file_type': 'pdf'
-    }
-)
-```
+## Config Settings
+- `config.VERBOSE`: Enables printing detailed process logs.
+- `config.DEBUG`: Enables detailed debugging output.
+  

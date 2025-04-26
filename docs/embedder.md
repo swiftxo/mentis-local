@@ -1,54 +1,61 @@
-# `embedder.py`: Embedding Utilities
+# Module: `embedder.py`
 
-This module handles the transformation of chunked text into vector embeddings using the `intfloat/multilingual-e5-large-instruct` model via `sentence-transformers`.
+## Purpose
+Handles loading of the sentence embedding model and provides utilities for embedding text batches with configurable normalization and output format. Also provides a helper for formatting detailed instruction prompts.
 
-The output vectors are used to:
-- Store chunks in a vector database (e.g., ChromaDB)
-- Compare similarity between queries and stored chunks
-- Enable fast and semantically aware retrieval
 
-## `load_embedder(model_name=...)`
+## Functions
 
-Loads the E5 embedding model from Hugging Face via `SentenceTransformer`.
+#### `load_embedder`
+- **Description**: Loads a sentence embedding model with automatic device detection (CPU or GPU).
+- **Parameters**:  
+  - `model_name` (str, optional): Name or path of the model to load. Defaults to `config.EMBED_MODEL_NAME`.
+- **Returns**:  
+  - `SentenceTransformer`: A loaded embedding model.
+- **Notes**:  
+  - Device selection respects `config.EMBED_DEVICE` or defaults to auto-detecting GPU if available.
 
-<details>
-<summary>Defaults:</summary>
+---
 
-- `model_name`: `"intfloat/multilingual-e5-large-instruct"`
-</details>
+#### `embed_texts`
+- **Description**: Embeds a list of text inputs into dense vectors, with optional normalization and batching.
+- **Parameters**:  
+  - `texts` (List[str]): List of input text strings to embed.  
+  - `model` (`SentenceTransformer`): Pre-loaded sentence embedding model.  
+  - `normalize` (bool, optional): Whether to normalize embeddings. Defaults to `config.EMBED_NORMALIZE`.  
+  - `as_tensor` (bool, optional): Whether to return results as a PyTorch tensor. Defaults to `config.EMBED_AS_TENSOR`.  
+  - `batch_size` (int, optional): Number of texts per batch during encoding. Defaults to `config.EMBED_BATCH_SIZE`.
+- **Returns**:  
+  - `torch.Tensor` or `List[List[float]]`: Batch of embeddings.
+- **Notes**:  
+  - Supports GPU acceleration if available.
 
-Returns: `SentenceTransformer` model instance
+---
 
-## `embed_texts(texts, model, normalize=True, as_tensor=True)`
+#### `get_detailed_instruct`
+- **Description**: Formats a task description and user query into a detailed instruction prompt for models that use instruction-based embeddings.
+- **Parameters**:  
+  - `task_description` (str): Description of the task for context.  
+  - `query` (str): The specific query or input.
+- **Returns**:  
+  - `str`: A formatted string combining the task and query.
+- **Notes**:  
+  - Mainly useful if using instruction-tuned models like E5 variants.
 
-Embeds a list of input texts into dense vectors.
 
-<details>
-<summary>Parameters:</summary>
+## Dependencies
+- `sentence_transformers`
+- `torch`
+- `typing` (`List`)
+- `archivum.config`
 
-- `texts` (List[str]): Input texts or chunks
-- `model` (SentenceTransformer): Loaded E5 model
-- `normalize` (bool): Normalize output vectors to unit length
-- `as_tensor` (bool): Return as a `torch.Tensor` if `True`
-</details>
+---
 
-Returns: `torch.Tensor` or `List[np.ndarray]` of vector embeddings
-
-## `get_detailed_instruct(task_description, query)`
-
-Formats a query using E5's expected input format for instruction-following tasks.
-
-<details>
-<summary>Format:</summary>
-
-``` 
-Instruct: {task_description}
-Query: {query}
-```
-</details>
-
-Returns: Formatted string to be embedded
-
-## Usage
-
-This module is called after chunking. It converts structured text chunks or search queries into vector form, enabling similarity search and LLM-enhanced reasoning steps.
+## Config Settings
+- `config.VERBOSE`: Enables verbose output during model loading and embedding.
+- `config.DEBUG`: Enables detailed debug outputs (sample embeddings, instructions).
+- `config.EMBED_MODEL_NAME`: Default model name to load.
+- `config.EMBED_DEVICE`: Preferred device for inference ("cpu", "cuda", or "auto").
+- `config.EMBED_NORMALIZE`: Whether embeddings should be L2-normalized.
+- `config.EMBED_AS_TENSOR`: Whether output should be a PyTorch tensor.
+- `config.EMBED_BATCH_SIZE`: Number of samples to process in one batch during encoding.

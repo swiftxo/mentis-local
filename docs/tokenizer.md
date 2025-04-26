@@ -1,56 +1,60 @@
-# `tokenizer_utils.py`: Tokenization Utilities
+# Module: `tokenizer_utils.py`
 
-This module handles text-to-token conversion using a custom Hugging Face-compatible tokenizer (`tokenizer.json`). It supports truncation and padding for consistent input lengths.
+## Purpose
+Handles loading a tokenizer from file and provides utility functions to tokenize text into token IDs and attention masks, or retrieve raw encodings.
 
-Tokenization is required before:
-- Chunking (to enforce token budgets)
-- Embedding (for token-aware models or stats)
-- LLM input formatting
+---
 
-## Constants
+## Functions
 
-<details>
-<summary>Defaults:</summary>
+#### `load_tokenizer`
+- **Description**: Loads a tokenizer from a saved file and enables padding and truncation according to config settings.
+- **Parameters**:  
+  - `path` (str, optional): Path to the tokenizer file. Defaults to `config.TOKENIZER_PATH`.
+- **Returns**:  
+  - `Tokenizer`: An initialized `Tokenizer` object ready for tokenization.
+- **Notes**:  
+  - Verbose logging is available if `config.VERBOSE` is enabled.
 
-- `TOKENIZER_PATH`: `"assets/tokenizer.json"`  
-- `PAD_ID`: `1`  
-- `PAD_TOKEN`: `"<pad>"`  
-- `MAX_LENGTH`: `512`
-</details>
+---
 
+#### `tokenize`
+- **Description**: Tokenizes input text into token IDs and attention masks.
+- **Parameters**:  
+  - `text` (str): The input text to tokenize.  
+  - `tokenizer` (`Tokenizer`): A pre-loaded tokenizer object.
+- **Returns**:  
+  - `Tuple[List[int], List[int]]`: A tuple containing the token IDs and the attention mask.
+- **Notes**:  
+  - Debug logging is available if `config.DEBUG` is enabled.
 
+---
 
-## `load_tokenizer(path=TOKENIZER_PATH)`
+#### `tokenize_raw`
+- **Description**: Tokenizes input text and returns the raw `Encoding` object.
+- **Parameters**:  
+  - `text` (str): The input text to tokenize.  
+  - `tokenizer` (`Tokenizer`): A pre-loaded tokenizer object.
+- **Returns**:  
+  - `Encoding`: The raw encoding result, including token IDs, masks, etc.
+- **Notes**:  
+  - Useful if you need access to more detailed tokenization data beyond IDs and masks.
 
-Loads a tokenizer from disk and enables:
-- Padding to a fixed `MAX_LENGTH`
-- Truncation beyond `MAX_LENGTH`
+---
 
-Returns: Initialized `Tokenizer` instance
+## Dependencies
+- `os`
+- `tokenizers` (from HuggingFace's `tokenizers` library)
+- `typing` (`Tuple`, `List`)
+- `archivum.config` (local module for configuration settings)
 
+---
 
+## Config Settings
+- `config.VERBOSE`: Enables verbose logging.
+- `config.DEBUG`: Enables detailed debug logs.
+- `config.TOKENIZER_PATH`: Default path to load the tokenizer file.
+- `config.TOKENIZER_MAX_LENGTH`: Maximum token length for padding/truncation.
+- `config.TOKENIZER_PAD_ID`: ID used for padding tokens.
+- `config.TOKENIZER_PAD_TOKEN`: String token used for padding.
 
-## `tokenize(text, tokenizer)`
-
-Encodes a single text into:
-- `token_ids` (List[int])
-- `attention_mask` (List[int])
-
-Returns: `(token_ids, attention_mask)`
-
-
-
-## `tokenize_raw(text, tokenizer)`
-
-Returns the full `Encoding` object for more detailed access (e.g. offsets, tokens, etc).
-
-Returns: `Encoding` (from Hugging Face `tokenizers`)
-
-
-
-## Usage
-
-This module standardizes input length and encoding behavior across:
-- Chunking pipelines (token-aware slicing)
-- Debugging tools (`debug_token_chunk`)
-- LLM input construction and analysis
