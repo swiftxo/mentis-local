@@ -1,6 +1,8 @@
 from archivum.vectordb.controller import get_or_create_collection, delete_collection
 from archivum.embedder import load_embedder, embed_texts, get_detailed_instruct
 import archivum.config as config
+from pathlib import Path
+import json
 
 VERBOSE = config.VERBOSE
 DEBUG = config.DEBUG
@@ -12,9 +14,26 @@ class Archivum:
         self.collection_name = collection_name
         self.collection = get_or_create_collection(storage_path, collection_name)
         self.embedder = load_embedder()
+        self.tracker_path = Path(storage_path) / f"{collection_name}_ingested_files.json"
+
 
         if VERBOSE:
             print(f"[Archivum|Init] Connected to collection '{self.collection_name}' at '{self.storage_path}'.")
+
+
+    def load_ingested_files(self) -> set:
+        """Load the set of already-ingested file paths."""
+        if not self.tracker_path.exists():
+            return set()
+        with open(self.tracker_path, "r") as f:
+            return set(json.load(f))
+        
+    def save_ingested_files(self, files: set):
+        """Save the updated set of ingested file paths."""
+        with open(self.tracker_path, "w") as f:
+            json.dump(list(files), f, indent=2)
+
+        
 
     def add_documents(self, documents: list[str], ids: list[str], metadatas: list[dict] = None):
         """Add documents to the Archivum, embedding them first."""

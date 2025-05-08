@@ -1,8 +1,8 @@
 
 # ========== Vectorstore / Database Settings ==========
-VECTOR_DB_PATH = "/Users/soho/Archivum Mentis/code/mentis-local/archivum/vectordb"            # Where ChromaDB will store collections
+VECTOR_DB_PATH = "/Users/soho/Archivum/code/mentis-local/archivum/vectordbb"            # Where ChromaDB will store collections
 COLLECTION_NAME = "archivum_fragments"    # Default collection name to create/use
-DATA_FOLDER = '/Users/soho/Archivum Mentis/code/mentis-local/input/sample'
+DATA_FOLDER = '/Users/soho/Archivum/code/mentis-local/input/sample'
 
 
 # ========== Embedding Settings ==========
