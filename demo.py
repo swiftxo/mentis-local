@@ -12,16 +12,22 @@ db = Archivum(
 ingest()
 
 
+exit_bool = False
+while not exit_bool:
+    query_text = input("Enter your query (or 'exit' to quit): ")
+    if query_text.lower() == 'exit':
+        exit_bool = True
+        print("Exiting the program.")
+        break
+    chunks = retrieve_chunks_with_metadata(query_text, n_results=5)
 
+    # Step 4: Print retrieved chunks
+    print("\n=== Retrieved Chunks ===")
+    for idx, chunk in enumerate(chunks, 1):
+        print(f"Chunk {idx}:")
+        print(f"Text: {chunk['text']}")
+        print(f"Metadata: {json.dumps(chunk['metadata'], indent=2)}")
+        print(f"Distance: {chunk['distance']}")
+        print("-" * 40)
 
-query_text = input("Enter your query: ")
-chunks = retrieve_chunks_with_metadata(query_text, n_results=5)
-
-# Step 4: Print retrieved chunks
-print("\n=== Retrieved Chunks ===")
-for idx, chunk in enumerate(chunks, 1):
-    print(f"Chunk {idx}:")
-    print(f"Text: {chunk['text']}")
-    print(f"Metadata: {json.dumps(chunk['metadata'], indent=2)}")
-    print(f"Distance: {chunk['distance']}")
-    print("-" * 40)
+        
