@@ -7,6 +7,9 @@ venv/
 .env/
 .venv/
 
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
 # Ignore system files
 .DS_Store
 # Ignore vector database files
